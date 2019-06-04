@@ -1,7 +1,7 @@
 name := """docker-play"""
 version := "2.7.2"
 
-lazy val root = (project in file(".")).enablePlugins(PlayJava)
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.12.8"
 
