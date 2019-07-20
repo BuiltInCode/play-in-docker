@@ -1,25 +1,13 @@
-name := """docker-play"""
-version := "2.7.2"
+name := """play-in-docker"""
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+version := sys.env.get("PLAY_VERSION").get
 
-scalaVersion := "2.12.8"
+lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
-javacOptions ++= Seq(
-  "-encoding", "UTF-8",
-  "-parameters",
-  "-Xlint:unchecked",
-  "-Xlint:deprecation",
-  "-Werror"
-)
+scalaVersion := sys.env.get("SCALA_VERSION").get
 
-crossScalaVersions := Seq("2.11.12", "2.12.8")
+crossScalaVersions := Seq("2.12.8", sys.env.get("SCALA_VERSION").get)
 
-libraryDependencies ++= Seq(
-  guice,
-  "com.h2database" % "h2" % "1.4.199",
-  "org.assertj" % "assertj-core" % "3.11.1" % Test,
-  "org.awaitility" % "awaitility" % "3.1.3" % Test
-)
+logLevel := Level.Error
 
-testOptions in Test := Seq(Tests.Argument(TestFrameworks.JUnit, "-a", "-v"))
+updateOptions := updateOptions.value.withCachedResolution(true)
