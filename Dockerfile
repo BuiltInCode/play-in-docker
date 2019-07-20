@@ -1,31 +1,29 @@
-FROM openjdk:8-slim
+FROM openjdk:12-alpine
 MAINTAINER James Coon <james@jcoon.dev>
 
-ENV JAVA_HOME /usr/local/openjdk-8
-ENV PATH $PATH:/usr/local/openjdk-8:/usr/local/jre/openjdk-8/jre/bin
-ENV SBT_VERSION 1.2.8
+# Establish preliminary path variables
+ENV \
+    SBT_HOME="/opt/sbt" \
+    SBT_VERSION="1.2.8" \
+    PLAY_VERSION="2.7.3" \
+    SCALA_VERSION="2.13.0" \
+    PATH="${PATH}:/opt/sbt/bin"
 
-# Install cURL
-RUN \
-    apt-get update && \
-    apt-get -y install curl
+# Install necessary build tools & install SBT v1.2.8
+RUN apk add --no-cache --virtual=.build-deps ca-certificates tar wget && \
+    apk add --no-cache bash curl jq && \
+    mkdir -p ${SBT_HOME} && \
+    wget -qO - --no-check-certificate "https://piccolo.link/sbt-${SBT_VERSION}.tgz" | tar xz -C ${SBT_HOME} --strip-components=1
 
-# Install SBT (for Play)
-RUN \
-    curl -L -o sbt-${SBT_VERSION}.deb https://dl.bintray.com/sbt/debian/sbt-${SBT_VERSION}.deb && \
-    dpkg -i sbt-${SBT_VERSION}.deb && \
-    rm sbt-${SBT_VERSION}.deb && \
-    apt-get update && \
-    apt-get -y install sbt
+# Prebuild application with SBT
+COPY ./src /tmp/build
 
-# Prebuild w/ SBT
-COPY ./src/ /tmp/build/
+RUN cd /tmp/build && \
+    sbt ++${SCALA_VERSION}! compile && \
+    rm -rf /tmp/
 
-RUN \
-    cd /tmp/build/ && \
-    sbt compile && \
-    sbt test:compile && \
-    rm -rf /tmp/build/
+# Finally, remove our build dependencies
+RUN apk del .build-deps
 
 # Set up Play! Framework directory and ports
 RUN mkdir -p /app
