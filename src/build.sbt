@@ -3,7 +3,7 @@ version := "2.7.2"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.13.0"
 
 javacOptions ++= Seq(
   "-encoding", "UTF-8",
@@ -13,7 +13,7 @@ javacOptions ++= Seq(
   "-Werror"
 )
 
-crossScalaVersions := Seq("2.11.12", "2.12.8")
+crossScalaVersions := Seq("2.11.12", "2.13.0")
 
 libraryDependencies ++= Seq(
   guice,
