@@ -5,11 +5,13 @@
 FROM openjdk:12-alpine AS build
 
 # Establish preliminary environment variables
+ARG PLAY_VERSION
+ARG SCALA_VERSION
+ARG SBT_VERSION
+
 ENV \
     SBT_HOME="/opt/sbt" \
-    SBT_VERSION="1.2.8" \
-    PLAY_VERSION="2.7.3" \
-    SCALA_VERSION="2.13.0" \
+    SBT_VERSION="${SBT_VERSION}" \
     PATH="${PATH}:/opt/sbt/bin"
 
 # Install necessary build tools & install SBT v1.2.8
@@ -33,18 +35,24 @@ RUN cd /tmp/build && \
 # ---------------------------------------------------------------------------
 FROM alpine:latest
 
+ARG PLAY_VERSION
+ARG SCALA_VERSION
+
 LABEL name="Play in Docker" \
       maintainer="James Coon <james@jcoon.dev>" \
       version="Play Framework v${PLAY_VERSION}" \
       homepage="https://github.com/BuiltInCode/play-in-docker"
 
+ENV PLAY_VERSION="${PLAY_VERSION}"
+ENV SCALA_VERSION="${SCALA_VERSION}"
 ENV PATH="${PATH}:/opt/openjdk-12/bin:/opt/sbt/bin"
 
 COPY --from=build /opt /opt
 COPY --from=build /root/.ivy2 /root/.ivy2
 COPY --from=build /root/.sbt /root/.sbt
 
-RUN mkdir -p /app
+RUN apk add bash && \
+    mkdir -p /app
 
 WORKDIR /app
 EXPOSE 9000
