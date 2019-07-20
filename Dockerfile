@@ -27,7 +27,7 @@ RUN cd /tmp/build && \
 # ------------------------------ BUILD TWO (2) ------------------------------
 # Using our previous build as a "base," create a new alpine Linux container
 # and copy ("extract") all of our built dependencies, such as OpenJDK and
-# SBT over to the new project.
+# SBT over to the new project, as well as SBT app/build dependencies
 #
 # Once that is finished, then install bash for SBT and configure our project
 # ---------------------------------------------------------------------------
@@ -35,17 +35,18 @@ FROM alpine:latest
 
 LABEL name="Play in Docker" \
       maintainer="James Coon <james@jcoon.dev>" \
-      version="Play Framework v2.7.3" \
+      version="Play Framework v${PLAY_VERSION}" \
       homepage="https://github.com/BuiltInCode/play-in-docker"
 
 ENV PATH="${PATH}:/opt/openjdk-12/bin:/opt/sbt/bin"
 
 COPY --from=build /opt /opt
-RUN apk add --no-cache bash
+COPY --from=build /root/.ivy2 /root/.ivy2
+COPY --from=build /root/.sbt /root/.sbt
+
 RUN mkdir -p /app
 
 WORKDIR /app
 EXPOSE 9000
 
-ENTRYPOINT ["sbt"]
-CMD ["run"]
+CMD ["sbt", "run"]
