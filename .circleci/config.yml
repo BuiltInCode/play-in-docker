@@ -1,0 +1,100 @@
+version: "2.1"
+
+executors:
+  docker-shared:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    environment:
+      IMAGE_NAME: jcoon97/play-in-docker
+      VALID_TAG_REGEX: "^v([0-9.]{5,}[-]?.*)$"
+
+jobs:
+  build:
+    executor: docker-shared
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 18.09.3
+      - run:
+          name: Log Job Information
+          command: |
+            echo "Job Details: {Name: '${CIRCLE_JOB}', Branch: '${CIRCLE_BRANCH}', Commit Hash: '${CIRCLE_SHA1}'}"
+            echo "Docker Build Arguments: {Play Version: '${PLAY_VERSION}', SBT Version: '${SBT_VERSION}', Scala Version: '${SCALA_VERSION}'}"
+            echo "Pull Request Details: {PR #: '${CIRCLE_PR_NUMBER}', Submitter: '${CIRCLE_PR_USERNAME}', URL: '${CIRCLE_PULL_REQUEST}'}"
+      - run:
+          name: Build Docker Image
+          command: >-
+            docker build \
+              --build-arg PLAY_VERSION=${PLAY_VERSION} \
+              --build-arg SBT_VERSION=${SBT_VERSION} \
+              --build-arg SCALA_VERSION=${SCALA_VERSION} \
+              -t ${IMAGE_NAME}:latest .
+      - run:
+          name: Save Docker Image
+          command: docker save -o image.tar ${IMAGE_NAME}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+
+  publish:
+    executor: docker-shared
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker:
+          version: 18.09.3
+      - run:
+          name: Load Cached Image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Tag Image, if Necessary
+          command: |
+            IS_BUILD_TAG=$([[ ${CIRCLE_TAG} =~ ${VALID_TAG_REGEX} ]] && echo true || echo false)
+
+            if [[ ${IS_BUILD_TAG} = true ]]; then
+                docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${BASE_REMATCH[1]}
+            fi
+      - run:
+          name: Publish to Docker Hub
+          command: |
+            echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USER}" --password-stdin
+            IMAGES=($(docker images --filter=reference="${IMAGE_NAME}" --format "{{ .Repository }}:{{ .Tag }}"))
+
+            for i in "${IMAGES[@]}";
+                do docker push ${i}
+            done
+
+workflows:
+  version: "2"
+
+  run-build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: master
+            tags:
+              ignore: /^v([0-9.]{5,}[-]?.*)/
+
+  run-release:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v([0-9.]{5,}[-]?.*)/
+      - request-to-publish:
+          type: approval
+          requires:
+            - build
+      - publish:
+          context: DOCKERHUB_CREDENTIALS
+          requires:
+            - request-to-publish
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v([0-9.]{5,}[-]?.*)/
