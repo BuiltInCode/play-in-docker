@@ -1,9 +1,0 @@
-#!/bin/bash
-echo "=> Building ${IMAGE_NAME} (GitHub Commit: ${SOURCE_COMMIT})";
-
-docker build \
-    --build-arg PLAY_VERSION=${PLAY_VERSION} \
-    --build-arg SBT_VERSION=${SBT_VERSION} \
-    --build-arg SCALA_VERSION=${SCALA_VERSION} \
-    -f ${DOCKERFILE_PATH} \
-    -t ${IMAGE_NAME} .
