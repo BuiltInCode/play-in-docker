@@ -73,7 +73,7 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: /^(ci-pipelines|master)/
+              ignore: master
             tags:
               ignore: /^v([0-9.]{5,}[-]?.*)/
 
@@ -82,7 +82,7 @@ workflows:
       - build:
           filters:
             branches:
-              only: /^(ci-pipelines|master)/
+              only: master
             tags:
               only: /^v([0-9.]{5,}[-]?.*)/
       - request-to-publish:
@@ -95,6 +95,6 @@ workflows:
             - request-to-publish
           filters:
             branches:
-              only: /^(ci-pipelines|master)/
+              only: master
             tags:
               only: /^v([0-9.]{5,}[-]?.*)/
