@@ -1,4 +1,4 @@
-# Play in Docker (v2.7.3)
+# Play in Docker (v2.8.0)
 [Play in Docker](https://cloud.docker.com/repository/docker/jcoon97/play-in-docker) is an easy-to-use, lightweight 
 Docker image that allows developers to get up-and-running using the latest version of Play Framework within minutes!
 
@@ -9,9 +9,9 @@ Docker image that allows developers to get up-and-running using the latest versi
 
 ## Technologies Used
 * [Java](https://hub.docker.com/_/openjdk) — `openjdk:12-alpine`
-* [Scala](https://www.scala-lang.org/) — `2.13.0`
-* [Scala Build Tools](https://www.scala-sbt.org/) ("SBT") — `1.2.8`
-* [Play Framework](https://www.playframework.com/) — `2.7.3`
+* [Scala](https://www.scala-lang.org/) — `2.13.1`
+* [Scala Build Tools](https://www.scala-sbt.org/) ("SBT") — `1.3.5`
+* [Play Framework](https://www.playframework.com/) — `2.8.0`
 
 ## Getting Started
 Getting started with Play in Docker is simple; the following sections will outline how, with very little configuration, 
@@ -31,10 +31,10 @@ is has properly loaded all of our necessary dependencies; however, the core Play
 there, as well.
 
 Open `project/plugins.sbt` using your favorite text editor or IDE and modify the following line to coincide with the 
-version of Play in Docker you will be using (currently running `2.7.3`):
+version of Play in Docker you will be using (currently running `2.8.0`):
 
 ```scala
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.7.3")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.0")
 ```
 
 #### Update `scalaVersion` in `build.sbt`
@@ -43,7 +43,7 @@ Scala that is download and that we will subsequently be using to write our appli
 favorite text editor or IDE and add _or_ modify the following line to correspond with the latest version of Scala:
 
 ```scala
-scalaVersion := "2.13.0"
+scalaVersion := "2.13.1"
 ```
 
 #### Update `sbt.version` in `project/build.properties`
@@ -55,7 +55,7 @@ are greeted with one line and it defines `sbt.version=?`. Replace with the `?` w
 we wish to use.
 
 ```scala
-sbt.version=1.2.8
+sbt.version=1.3.5
 ```  
 
 ### Docker Setup

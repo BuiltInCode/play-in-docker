@@ -4,6 +4,11 @@ This documentation will contain high-level information regarding what has change
 Please keep in mind that this changelog contains release information for `Play in Docker`, **not** `Play Framework`. If 
 you wish to see Play's changelog, please [click here](https://www.playframework.com/changelog).
 
+## v2.8.0 (2020-02-05)
+* Upgraded Play Framework version to use v2.8.0
+* Upgraded Scala SBT version to use v1.3.5
+* Upgraded `crossScalaVersions` to use the minimum Scala version v2.12.10
+
 ## v2.7.3 (2019-07-20)
 * Re-wrote Dockerfile to use alpine-based images for better space conservation
 * Implemented build arguments for faster upgrades/iterations in the future

@@ -48,7 +48,6 @@ ENV SCALA_VERSION="${SCALA_VERSION}"
 ENV PATH="${PATH}:/opt/openjdk-12/bin:/opt/sbt/bin"
 
 COPY --from=build /opt /opt
-COPY --from=build /root/.ivy2 /root/.ivy2
 COPY --from=build /root/.sbt /root/.sbt
 
 RUN apk add bash && \
